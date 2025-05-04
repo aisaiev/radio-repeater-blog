@@ -1,0 +1,35 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: self-hosted
+    environment: development
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Create .env file
+        run: |
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+          echo "API_KEY=${{ secrets.API_KEY }}" >> .env
+      
+      - name: Stop and remove container
+        run: |
+          docker stop radio-repeater-blog || true
+          docker rm radio-repeater-blog || true
+      
+      - name: Remove Docker image
+        run: |
+          docker rmi radio-repeater-blog:latest || true
+      
+      - name: Build Docker image
+        run: |
+          docker build -t radio-repeater-blog:latest .
+      
+      - name: Run Docker container
+        run: |
+          docker run -d --name radio-repeater-blog -p 3004:3000 -v /home/anton/dev/radio-repeater-blog/assets:/blog/public/assets radio-repeater-blog:latest

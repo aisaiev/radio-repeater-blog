@@ -1,0 +1,72 @@
+<section class="container">
+    <a [routerLink]="['../']" class="secondary back-button" aria-label="Back">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon">
+            <path
+                d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z" />
+        </svg>
+        <span>Back</span>
+    </a>
+
+    @if (article()) {
+        <article class="article">
+            <div class="article-header">
+                <h2>{{ article()!.title }}</h2>
+                <label>
+                    <input name="terms" type="checkbox" role="switch" class="switch" [(ngModel)]="transcriptionView" />
+                    Транскрипція
+                </label>
+            </div>
+            <p class="article-date">
+                <small>
+                    {{ article()!.date | date: 'dd.MM.yyyy' }}
+                </small>
+            </p>
+            <img #image
+                src="{{apiUrl}}/assets/img/{{article()!.coverImageName}}"
+                alt="{{ article()!.coverImageName }}"
+                class="article-image"
+                width="1536px"
+                height="1024px"
+                (error)="setDefaultImageOnError(image)"/>
+            <p>{{ article()!.content }}</p>
+
+            @if (!transcriptionView()) {
+                @for (transcription of article()!.transcriptions; track transcription.id) {
+                    <hr/>
+                    <section class="transcription" [class.active]="activeTranscriptionId() === transcription.id">
+                        <h4 class="transcription-title" (click)="setAudioTime(transcription)">
+                            {{ transcription.title }} ({{ transcription.start }} - {{ transcription.end }})
+                        </h4>
+                        <p class="transcription-content">
+                            {{ transcription.content }}
+                        </p>
+                    </section>
+                }
+            } @else {
+                @for (transcription of article()!.rawTranscriptions; track transcription.id) {
+                    <hr />
+                    <section class="transcription" [class.active]="activeTranscriptionId() === transcription.id">
+                        <h4 class="transcription-title" (click)="setAudioTime(transcription)">
+                            ({{ transcription.start }} - {{ transcription.end }})
+                        </h4>
+                        <p class="transcription-content">
+                            {{ transcription.content }}
+                        </p>
+                    </section>
+                }
+            }
+
+            <hr/>
+
+            <div class="audio-container">
+                <audio #audioPlayer controls (timeupdate)="onAudioTimeUpdate(audioPlayer.currentTime)">
+                    <source src="{{apiUrl}}/assets/audio/{{article()!.sourceFileName}}" type="audio/mpeg">
+                </audio>
+            </div>
+        </article>
+    } @else if (loading()) {
+        <div class="loading-container">
+            <span aria-busy="true">Завантаження...</span>
+        </div>
+    }
+</section>

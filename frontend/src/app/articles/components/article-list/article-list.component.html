@@ -1,0 +1,44 @@
+<div class="container">
+    @if (!isChildRouteActivated()) {
+        @if (articles().length) {
+            @for (article of articles(); track article.id) {
+                <article class="article">
+                    <h2>
+                        <a [routerLink]="['/article', article.id]">
+                            {{ article.title }}
+                        </a>
+                    </h2>
+                    <p class="article-date">
+                        <small>
+                            {{ article.date | date: 'dd.MM.yyyy' }}
+                        </small>
+                    </p>
+                    <p>
+                        <a [routerLink]="['/article', article.id]">
+                            {{ article.summary }}
+                        </a>
+                    </p>
+                </article>
+            }
+        
+            @if (canLoadMore()) {
+                <div class="load-more-articles-container">
+                    <button type="button" class="secondary" [ariaBusy]="loading()" (click)="loadArticles(page() + 1)">
+                        {{ loading() ? 'Завантаження...' : 'Завантажити ще' }}
+                    </button>
+                </div>
+            }
+        } @else {
+            @if (loading()) {
+                <div class="loading-container">
+                    <span aria-busy="true">Завантаження...</span>
+                </div>
+            } @else {
+                <div class="no-articles">
+                    <p>Ще немає дописів</p>
+                </div>
+            }
+        }
+    }
+    <router-outlet (activate)="isChildRouteActivated.set(true)" (deactivate)="isChildRouteActivated.set(false)"/>
+</div>
