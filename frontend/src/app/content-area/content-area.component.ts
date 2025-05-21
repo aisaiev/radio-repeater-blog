@@ -4,7 +4,7 @@ import { ArticleListComponent } from '../articles/components/article-list/articl
 @Component({
     selector: 'app-content-area-component',
     imports: [ArticleListComponent],
-    templateUrl: './content-area-component.component.html',
-    styleUrl: './content-area-component.component.scss',
+    templateUrl: './content-area.component.html',
+    styleUrl: './content-area.component.scss',
 })
-export class ContentAreaComponentComponent {}
+export class ContentAreaComponent {}
