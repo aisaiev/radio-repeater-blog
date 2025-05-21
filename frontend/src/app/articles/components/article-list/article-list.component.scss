@@ -1,5 +1,9 @@
 .container {
     height: 100%;
+
+    .search-container {
+        padding: 0 var(--pico-block-spacing-horizontal);
+    }
 }
 
 .article {

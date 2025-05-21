@@ -1,10 +1,10 @@
 import { Routes } from '@angular/router';
-import { ArticleListComponent } from './articles/components/article-list/article-list.component';
+import { ContentAreaComponent } from './content-area/content-area.component';
 
 export const routes: Routes = [
     {
         path: '',
-        component: ArticleListComponent,
+        component: ContentAreaComponent,
         children: [
             {
                 path: 'article/:id',

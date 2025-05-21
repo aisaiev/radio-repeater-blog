@@ -12,8 +12,11 @@ export class ArticlesService {
     private http = inject(HttpClient);
     private apiUrl = `${environment.apiUrl}/api/articles`;
 
-    public getArticles(page: number): Observable<PaginationResponseDto<ArticleDto>> {
-        const params = new HttpParams().set('page', page).set('pageSize', 5);
+    public getArticles(page: number, searchTerm?: string): Observable<PaginationResponseDto<ArticleDto>> {
+        let params = new HttpParams().set('page', page).set('pageSize', 5);
+        if (searchTerm) {
+            params = params.set('search', searchTerm);
+        }
         return this.http.get<PaginationResponseDto<ArticleDto>>(this.apiUrl, { params }).pipe(
             tap((resp) => {
                 resp.data.forEach((article) => {

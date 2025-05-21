@@ -9,6 +9,8 @@ export class PaginationRequestDto {
   @IsPositive()
   @Transform(({ value }) => parseInt(value as string))
   pageSize: number;
+
+  search?: string;
 }
 
 export class PaginationResponseDto<T> {

@@ -3,7 +3,15 @@ import { DATABASE_CONNECTION } from 'src/database/database-connection';
 import * as schema from '../schema';
 import * as transcriptionsSchema from 'src/transcriptions/schema';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { count, desc } from 'drizzle-orm';
+import {
+  count,
+  countDistinct,
+  desc,
+  eq,
+  ilike,
+  inArray,
+  SQL,
+} from 'drizzle-orm';
 import { CreateArticleRequest } from '../dto/create-article.request';
 import { TranscriptionsService } from 'src/transcriptions/service/transcriptions.service';
 import { GetArticlesResponse } from '../dto/get-articles.response';
@@ -24,28 +32,41 @@ export class ArticlesService {
   async getArticles(
     data: PaginationRequestDto,
   ): Promise<PaginationResponseDto<GetArticlesResponse>> {
-    const total = await this.database
-      .select({ count: count(schema.articles.id) })
-      .from(schema.articles)
-      .then((result) => result[0].count);
+    const { search, page, pageSize } = data;
 
-    const articles = await this.database
-      .select({
-        id: schema.articles.id,
-        title: schema.articles.title,
-        summary: schema.articles.summary,
-        date: schema.articles.date,
-      })
-      .from(schema.articles)
-      .orderBy(desc(schema.articles.date))
-      .limit(data.pageSize)
-      .offset((data.page - 1) * data.pageSize);
+    const filter = search
+      ? ilike(transcriptionsSchema.transcriptions.content, `%${search}%`)
+      : undefined;
+
+    const total = await this.getArticlesTotal(filter);
+
+    let articles: GetArticlesResponse[];
+    if (!filter) {
+      articles = await this.database
+        .select({
+          id: schema.articles.id,
+          title: schema.articles.title,
+          summary: schema.articles.summary,
+          date: schema.articles.date,
+        })
+        .from(schema.articles)
+        .orderBy(desc(schema.articles.date))
+        .limit(pageSize)
+        .offset((page - 1) * pageSize);
+    } else {
+      const articleIds = await this.getArticleIdsByFilter(
+        filter,
+        page,
+        pageSize,
+      );
+      articles = await this.getArticlesByIds(articleIds);
+    }
 
     return {
       data: articles,
       total,
-      page: data.page,
-      pageSize: data.pageSize,
+      page,
+      pageSize,
     };
   }
 
@@ -115,5 +136,59 @@ export class ArticlesService {
         ...rawTranscriptions,
       ]);
     }
+  }
+
+  private async getArticlesTotal(filter?: SQL): Promise<number> {
+    if (!filter) {
+      return this.database
+        .select({ count: count(schema.articles.id) })
+        .from(schema.articles)
+        .then((result) => result[0].count);
+    }
+    return this.database
+      .select({ count: countDistinct(schema.articles.id) })
+      .from(schema.articles)
+      .leftJoin(
+        transcriptionsSchema.transcriptions,
+        eq(transcriptionsSchema.transcriptions.articleId, schema.articles.id),
+      )
+      .where(filter)
+      .then((result) => result[0].count);
+  }
+
+  private async getArticleIdsByFilter(
+    filter: SQL,
+    page: number,
+    pageSize: number,
+  ): Promise<number[]> {
+    return this.database
+      .select({ id: schema.articles.id })
+      .from(schema.articles)
+      .leftJoin(
+        transcriptionsSchema.transcriptions,
+        eq(transcriptionsSchema.transcriptions.articleId, schema.articles.id),
+      )
+      .where(filter)
+      .orderBy(desc(schema.articles.date))
+      .limit(pageSize)
+      .offset((page - 1) * pageSize)
+      .groupBy(schema.articles.id)
+      .then((rows) => rows.map((a) => a.id));
+  }
+
+  private async getArticlesByIds(
+    ids: number[],
+  ): Promise<GetArticlesResponse[]> {
+    if (!ids.length) return [];
+    return this.database
+      .select({
+        id: schema.articles.id,
+        title: schema.articles.title,
+        summary: schema.articles.summary,
+        date: schema.articles.date,
+      })
+      .from(schema.articles)
+      .where(inArray(schema.articles.id, ids))
+      .orderBy(desc(schema.articles.date));
   }
 }

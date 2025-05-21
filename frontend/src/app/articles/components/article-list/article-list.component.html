@@ -1,5 +1,8 @@
 <div class="container">
-    @if (!isChildRouteActivated()) {
+    <div class="container" [hidden]="isChildRouteActivated()">
+        <div class="search-container">
+            <app-search (searchTermChange)="searchTermChanged($event)"></app-search>
+        </div>
         @if (articles().length) {
             @for (article of articles(); track article.id) {
                 <article class="article">
@@ -23,7 +26,7 @@
         
             @if (canLoadMore()) {
                 <div class="load-more-articles-container">
-                    <button type="button" class="secondary" [ariaBusy]="loading()" (click)="loadArticles(page() + 1)">
+                    <button type="button" class="secondary" [ariaBusy]="loading()" (click)="loadArticles(page() + 1, searchTerm())">
                         {{ loading() ? 'Завантаження...' : 'Завантажити ще' }}
                     </button>
                 </div>
@@ -39,6 +42,6 @@
                 </div>
             }
         }
-    }
+    </div>
     <router-outlet (activate)="isChildRouteActivated.set(true)" (deactivate)="isChildRouteActivated.set(false)"/>
 </div>
