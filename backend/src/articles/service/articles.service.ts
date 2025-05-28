@@ -83,6 +83,7 @@ export class ArticlesService {
 
     const transcriptions = (articleTranscriptions as unknown as Transcription[])
       .filter((t) => !t.isRaw)
+      .sort((a, b) => a.id - b.id)
       .map((t) => {
         return {
           id: t.id,
@@ -96,6 +97,7 @@ export class ArticlesService {
       articleTranscriptions as unknown as Transcription[]
     )
       .filter((t) => t.isRaw)
+      .sort((a, b) => a.id - b.id)
       .map((t) => {
         return {
           id: t.id,
