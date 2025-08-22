@@ -2,32 +2,21 @@ import {
   Body,
   Controller,
   Get,
-  Headers,
   NotFoundException,
   Param,
   ParseIntPipe,
   Post,
   Query,
-  UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { ArticlesService } from '../service/articles.service';
 import { CreateArticleRequest } from '../dto/create-article.request';
 import { PaginationRequestDto } from 'src/common/dto/pagination.dto';
-import { ConfigService } from '@nestjs/config';
-import { EnvironmentVariables } from 'src/config/app-config.consts';
+import { ApiGuard } from 'src/guards/api.guard';
 
 @Controller('articles')
 export class ArticlesController {
-  private readonly trustedApiKey: string;
-
-  constructor(
-    private readonly articlesService: ArticlesService,
-    private readonly configService: ConfigService,
-  ) {
-    this.trustedApiKey = this.configService.getOrThrow(
-      EnvironmentVariables.API_KEY,
-    );
-  }
+  constructor(private readonly articlesService: ArticlesService) {}
 
   @Get()
   async getArticles(@Query() data: PaginationRequestDto) {
@@ -44,13 +33,8 @@ export class ArticlesController {
   }
 
   @Post()
-  async createArticle(
-    @Headers('x-api-key') apiKey: string,
-    @Body() article: CreateArticleRequest,
-  ) {
-    if (apiKey !== this.trustedApiKey) {
-      throw new UnauthorizedException('Invalid API key');
-    }
+  @UseGuards(ApiGuard)
+  async createArticle(@Body() article: CreateArticleRequest) {
     await this.articlesService.createArticle(article);
   }
 }
