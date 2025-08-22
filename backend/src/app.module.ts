@@ -5,6 +5,7 @@ import { ArticlesModule } from './articles/articles.module';
 import { TranscriptionsModule } from './transcriptions/transcriptions.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { join } from 'path';
     DatabaseModule,
     ArticlesModule,
     TranscriptionsModule,
+    FilesModule,
   ],
   controllers: [],
   providers: [],
