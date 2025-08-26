@@ -17,6 +17,7 @@ jobs:
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
           echo "API_KEY=${{ secrets.API_KEY }}" >> .env
           echo "AUDIO_FILES_DIR"=${{ secrets.AUDIO_FILES_DIR }} >> .env
+          echo "IMAGE_FILES_DIR"=${{ secrets.IMAGE_FILES_DIR }} >> .env
       
       - name: Stop and remove container
         run: |

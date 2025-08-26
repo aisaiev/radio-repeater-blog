@@ -28,4 +28,18 @@ export class FilesController {
   ) {
     return await this.filesService.saveAudioFile(file);
   }
+
+  @Post('image')
+  @UseInterceptors(FileInterceptor('file'))
+  @UseGuards(ApiGuard)
+  async uploadImage(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new FileTypeValidator({ fileType: 'image/avif' })],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    return await this.filesService.saveImageFile(file);
+  }
 }
