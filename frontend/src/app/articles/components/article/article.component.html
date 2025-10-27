@@ -11,16 +11,18 @@
         <article class="article">
             <div class="article-header">
                 <h2>{{ article()!.title }}</h2>
-                <label>
+            </div>
+            <div class="article-meta">
+                <p class="article-date">
+                    <small>
+                        {{ article()!.date | date: 'dd.MM.yyyy' }}
+                    </small>
+                </p>
+                <label class="transcription-switch">
                     <input name="terms" type="checkbox" role="switch" class="switch" [(ngModel)]="transcriptionView" />
                     Транскрипція
                 </label>
             </div>
-            <p class="article-date">
-                <small>
-                    {{ article()!.date | date: 'dd.MM.yyyy' }}
-                </small>
-            </p>
             <img #image
                 src="{{apiUrl}}/assets/img/{{article()!.coverImageName}}"
                 alt="{{ article()!.coverImageName }}"

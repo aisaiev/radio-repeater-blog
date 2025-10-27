@@ -33,22 +33,29 @@
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
-
-        label {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-        }
     }
 
     .article-image {
         padding-bottom: 1rem;
     }
 
-    .article-date {
-        font-size: 0.8rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
+    .article-meta {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: baseline;
+
+        .article-date {
+            font-weight: 600;
+            margin-bottom: 0px;
+        }
+
+        .transcription-switch {
+            input {
+                scale: 0.8;
+                margin-right: 0px;
+            }
+        }
     }
 }
 
