@@ -34,4 +34,4 @@ jobs:
       
       - name: Run Docker container
         run: |
-          docker run -d --name radio-repeater-blog -p 3004:3000 -v /home/anton/dev/radio-repeater-blog/assets:/blog/public/assets radio-repeater-blog:latest
+          docker run -d --name radio-repeater-blog -p 3004:3000 -v ${{ secrets.ASSETS_FILES_DIR }}:/blog/public/assets radio-repeater-blog:latest
