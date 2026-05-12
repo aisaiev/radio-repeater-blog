@@ -1,4 +1,5 @@
 import { Component, effect, ElementRef, inject, input, OnInit, signal, ViewChild } from '@angular/core';
+import { Location } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { ArticlesService } from '../../services/articles.service';
 import { ArticleWithContentDto, RawTranscriptionDto } from '../../dto/article.dto';
@@ -18,6 +19,7 @@ export class ArticleComponent implements OnInit {
 
     private readonly articlesService = inject(ArticlesService);
     private readonly router = inject(Router);
+    private readonly location = inject(Location);
 
     public articleId = input.required<number>({ alias: 'id' });
 
@@ -65,6 +67,11 @@ export class ArticleComponent implements OnInit {
 
         const activeTranscriptionId = this.findActiveTranscriptionId(transcriptions, currentTime);
         this.activeTranscriptionId.set(activeTranscriptionId || null);
+    }
+
+    public goBack(event: Event): void {
+        event.preventDefault();
+        this.location.back();
     }
 
     private findActiveTranscriptionId(transcriptions: RawTranscriptionDto[], currentTime: number): number | null {
