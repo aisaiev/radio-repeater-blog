@@ -27,8 +27,6 @@
                 src="{{apiUrl}}/assets/img/{{article()!.coverImageName}}"
                 alt="{{ article()!.coverImageName }}"
                 class="article-image"
-                width="1536px"
-                height="1024px"
                 (error)="setDefaultImageOnError(image)"/>
             <p>{{ article()!.content }}</p>
 

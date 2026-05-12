@@ -1,4 +1,4 @@
-import { Component, Input, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ArticlesService } from '../../services/articles.service';
 import { ArticleDto } from '../../dto/article.dto';
 import { finalize } from 'rxjs';
@@ -8,6 +8,8 @@ import { SearchComponent } from '../../../common/components/search/search.compon
 
 @Component({
     selector: 'app-article-list',
+    standalone: true,
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [RouterModule, DatePipe, SearchComponent],
     templateUrl: './article-list.component.html',
     styleUrl: './article-list.component.scss',

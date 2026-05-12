@@ -1,14 +1,16 @@
-import { Component, Renderer2 } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Renderer2 } from '@angular/core';
 
 @Component({
     selector: 'app-theme-toggle',
+    standalone: true,
+    changeDetection: ChangeDetectionStrategy.OnPush,
     templateUrl: './theme-toggle.component.html',
     styleUrls: ['./theme-toggle.component.scss'],
 })
 export class ThemeToggleComponent {
-    public isDarkMode = false;
+    private renderer = inject(Renderer2);
 
-    constructor(private renderer: Renderer2) {}
+    public isDarkMode = false;
 
     toggleTheme(): void {
         this.isDarkMode = !this.isDarkMode;

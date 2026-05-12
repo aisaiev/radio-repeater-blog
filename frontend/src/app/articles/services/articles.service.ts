@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { catchError, EMPTY, Observable, of, tap } from 'rxjs';
 import { ArticleDto, ArticleWithContentDto } from '../dto/article.dto';
-import { PaginationRequestDto, PaginationResponseDto } from '../../common/pagination.dto';
+import { PaginationResponseDto } from '../../common/pagination.dto';
 
 @Injectable({
     providedIn: 'root',

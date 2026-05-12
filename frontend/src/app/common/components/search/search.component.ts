@@ -1,28 +1,25 @@
-import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, inject, OnDestroy, OnInit, output, Output } from '@angular/core';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
     selector: 'app-search',
+    standalone: true,
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [ReactiveFormsModule],
     templateUrl: './search.component.html',
     styleUrls: ['./search.component.scss'],
 })
-export class SearchComponent implements OnInit, OnDestroy {
+export class SearchComponent implements OnInit {
+    private destroyRef = inject(DestroyRef);
     public searchControl = new FormControl('');
-    private destroy$ = new Subject<void>();
-
-    @Output() public searchTermChange = new EventEmitter<string>();
+    public searchTermChange = output<string>();
 
     public ngOnInit(): void {
-        this.searchControl.valueChanges.pipe(debounceTime(400), distinctUntilChanged(), takeUntil(this.destroy$)).subscribe((value) => {
+        this.searchControl.valueChanges.pipe(debounceTime(400), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef)).subscribe((value) => {
             this.searchTermChange.emit(value ?? '');
         });
-    }
-
-    public ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
     }
 }

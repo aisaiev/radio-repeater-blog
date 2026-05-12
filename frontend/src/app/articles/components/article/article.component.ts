@@ -1,4 +1,4 @@
-import { Component, effect, ElementRef, inject, input, OnInit, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, inject, input, OnInit, signal, viewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { ArticlesService } from '../../services/articles.service';
@@ -10,12 +10,14 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-article',
+    standalone: true,
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [RouterModule, DatePipe, FormsModule],
     templateUrl: './article.component.html',
     styleUrl: './article.component.scss',
 })
 export class ArticleComponent implements OnInit {
-    @ViewChild('audioPlayer') audioPlayer!: ElementRef<HTMLAudioElement>;
+    private readonly audioPlayer = viewChild<ElementRef<HTMLAudioElement>>('audioPlayer');
 
     private readonly articlesService = inject(ArticlesService);
     private readonly router = inject(Router);
@@ -48,8 +50,9 @@ export class ArticleComponent implements OnInit {
 
     public setAudioTime(transcription: RawTranscriptionDto): void {
         this.activeTranscriptionId.set(transcription.id);
-        if (this.audioPlayer && this.audioPlayer.nativeElement) {
-            this.audioPlayer.nativeElement.currentTime = this.converTimeStringToSeconds(transcription.start) + 0.1;
+        const audioPlayer = this.audioPlayer()?.nativeElement;
+        if (audioPlayer) {
+            audioPlayer.currentTime = this.converTimeStringToSeconds(transcription.start) + 0.1;
         }
     }
 
@@ -79,7 +82,7 @@ export class ArticleComponent implements OnInit {
             transcriptions.find(
                 (transcription) =>
                     this.converTimeStringToSeconds(transcription.start) <= currentTime &&
-                    this.converTimeStringToSeconds(transcription.end) >= currentTime
+                    this.converTimeStringToSeconds(transcription.end) >= currentTime,
             )?.id ?? null
         );
     }
