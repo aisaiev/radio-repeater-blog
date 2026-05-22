@@ -1,19 +1,34 @@
-FROM node:22
+FROM node:24-alpine AS frontend-builder
+WORKDIR /app/frontend
 
-COPY . /blog
-
-# Copy GitHub secrets
-COPY .env /blog/backend
-
-WORKDIR /blog/frontend
+COPY frontend/package*.json ./
 RUN npm install
+
+COPY frontend/ ./
 RUN npm run build
 
-RUN mkdir -p /blog/public && cp -r ./dist/radio-repeater-blog/browser/* /blog/public
+FROM node:24-alpine AS backend-builder
+WORKDIR /app/backend
 
-WORKDIR /blog/backend
+COPY backend/package*.json ./
 RUN npm install
+
+COPY backend/ ./
 RUN npm run build
+
+FROM node:24-alpine AS backend-prod-deps
+WORKDIR /app/backend
+
+COPY backend/package*.json ./
+RUN npm install --omit=dev
+
+FROM node:24-alpine AS runtime
+WORKDIR /app/backend
+
+COPY --from=backend-prod-deps /app/backend/node_modules ./node_modules
+COPY --from=backend-builder /app/backend/dist ./dist
+COPY --from=backend-builder /app/backend/package.json ./package.json
+COPY --from=frontend-builder /app/frontend/dist/radio-repeater-blog/browser /app/public
 
 EXPOSE 3000
 

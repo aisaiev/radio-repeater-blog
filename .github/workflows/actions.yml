@@ -10,28 +10,19 @@ jobs:
     runs-on: self-hosted
     environment: development
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Create .env file
-        run: |
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
-          echo "API_KEY=${{ secrets.API_KEY }}" >> .env
-          echo "AUDIO_FILES_DIR"=${{ secrets.AUDIO_FILES_DIR }} >> .env
-          echo "IMAGE_FILES_DIR"=${{ secrets.IMAGE_FILES_DIR }} >> .env
-      
-      - name: Stop and remove container
-        run: |
-          docker stop radio-repeater-blog || true
-          docker rm radio-repeater-blog || true
-      
-      - name: Remove Docker image
-        run: |
-          docker rmi radio-repeater-blog:latest || true
-      
-      - name: Build Docker image
-        run: |
-          docker build -t radio-repeater-blog:latest .
-      
-      - name: Run Docker container
-        run: |
-          docker run -d --name radio-repeater-blog -p 3004:3000 --restart unless-stopped -v ${{ secrets.ASSETS_FILES_DIR }}:/blog/public/assets radio-repeater-blog:latest
+      - uses: actions/checkout@v4
+      - run: |
+          touch .env
+          echo DATABASE_URL="${{ secrets.DATABASE_URL }}" >> .env
+          echo API_KEY="${{ secrets.API_KEY }}" >> .env
+          echo AUDIO_FILES_DIR="${{ secrets.AUDIO_FILES_DIR }}" >> .env
+          echo IMAGE_FILES_DIR="${{ secrets.IMAGE_FILES_DIR }}" >> .env
+          IMAGE="radio-repeater-blog:latest"
+          NAME="radio-repeater-blog"
+
+          docker stop "$NAME" || true
+          docker rm --force "$NAME" || true
+          docker rmi --force "$IMAGE" || true
+
+          docker build . -t "$IMAGE" --progress=plain
+          docker run --env-file .env -p 3004:3000 --name "$NAME" --restart unless-stopped -v ${{ secrets.ASSETS_FILES_DIR }}:/app/public/assets -d "$IMAGE"
