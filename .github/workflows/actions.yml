@@ -25,4 +25,4 @@ jobs:
           docker rmi --force "$IMAGE" || true
 
           docker build . -t "$IMAGE" --progress=plain
-          docker run --env-file .env -p 3004:3000 --name "$NAME" --restart unless-stopped -v ${{ secrets.ASSETS_FILES_DIR }}:/blog/public/assets -d "$IMAGE"
+          docker run --env-file .env -p 3004:3000 --name "$NAME" --restart unless-stopped -v ${{ secrets.ASSETS_FILES_DIR }}:/app/public/assets -d "$IMAGE"
