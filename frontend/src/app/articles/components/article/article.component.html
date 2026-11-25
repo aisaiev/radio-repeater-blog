@@ -35,7 +35,7 @@
                     <hr/>
                     <section class="transcription" [class.active]="activeTranscriptionId() === transcription.id">
                         <h4 class="transcription-title">
-                            <button type="button" (click)="setAudioTime(transcription)">{{ transcription.title }} ({{ transcription.start }} - {{ transcription.end }})</button>
+                            <button type="button" (click)="setAudioTime(transcription)">{{ transcription.title }} ({{ withoutMilliseconds(transcription.start) }} - {{ withoutMilliseconds(transcription.end) }})</button>
                         </h4>
                         <p class="transcription-content">
                             {{ transcription.content }}
@@ -47,7 +47,7 @@
                     <hr />
                     <section class="transcription" [class.active]="activeTranscriptionId() === transcription.id">
                         <h4 class="transcription-title">
-                            <button type="button" (click)="setAudioTime(transcription)">({{ transcription.start }} - {{ transcription.end }})</button>
+                            <button type="button" (click)="setAudioTime(transcription)">({{ withoutMilliseconds(transcription.start) }} - {{ withoutMilliseconds(transcription.end) }})</button>
                         </h4>
                         <p class="transcription-content">
                             {{ transcription.content }}

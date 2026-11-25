@@ -66,8 +66,13 @@ export class ArticleComponent implements OnInit, OnDestroy {
     }
 
     private converTimeStringToSeconds(timeString: string): number {
-        const [hours, minutes, seconds] = timeString.split(':').map(Number);
+        // Some articles use SRT time with milliseconds: 00:00:08,000
+        const [hours, minutes, seconds] = timeString.replace(',', '.').split(':').map(Number);
         return hours * 3600 + minutes * 60 + seconds;
+    }
+
+    public withoutMilliseconds(timeString: string): string {
+        return timeString.split(/[,.]/)[0];
     }
 
     public setDefaultImageOnError(image: HTMLImageElement): void {
