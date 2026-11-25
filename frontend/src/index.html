@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="uk">
 
 <head>
     <meta charset="utf-8">
@@ -13,6 +13,13 @@
     <meta property="og:url" content="https://k1-repeater-blog.aisaiev.net">
     <meta property="og:type" content="website">
     <link rel="icon" type="image/x-icon" href="https://fav.farm/📻">
+    <script>
+        // Apply the saved theme before first paint
+        try {
+            const theme = localStorage.getItem('theme');
+            if (theme === 'dark' || theme === 'light') document.documentElement.dataset.theme = theme;
+        } catch {}
+    </script>
 </head>
 
 <body>

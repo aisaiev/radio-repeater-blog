@@ -1,8 +1,18 @@
-<div class="container">
-    <div class="container" [hidden]="isChildRouteActivated()">
+<div class="articles">
+    <div class="articles-list" [hidden]="isChildRouteActivated()">
         <div class="search-container">
             <app-search (searchTermChange)="searchTermChanged($event)"></app-search>
+            <p class="search-status" role="status">
+                @if (searchTerm() && !loading() && !failed() && total()) {
+                    Знайдено: {{ total() }}
+                }
+            </p>
         </div>
+        @if (failed()) {
+            <div class="no-articles">
+                <p>Не вдалося завантажити дописи. <a href="" (click)="$event.preventDefault(); retry()">Спробувати ще раз</a></p>
+            </div>
+        }
         @if (articles().length) {
             @for (article of articles(); track article.id) {
                 <article class="article">
@@ -26,19 +36,19 @@
         
             @if (canLoadMore()) {
                 <div class="load-more-articles-container">
-                    <button type="button" class="contrast" [ariaBusy]="loading()" (click)="loadArticles(page() + 1, searchTerm())">
+                    <button type="button" class="contrast" [ariaBusy]="loading()" (click)="loadArticles(page() + 1)">
                         {{ loading() ? 'Завантаження...' : 'Завантажити ще' }}
                     </button>
                 </div>
             }
-        } @else {
+        } @else if (!failed()) {
             @if (loading()) {
                 <div class="loading-container">
                     <span aria-busy="true">Завантаження...</span>
                 </div>
             } @else {
                 <div class="no-articles">
-                    <p>Ще немає дописів</p>
+                    <p>{{ searchTerm() ? 'За запитом «' + searchTerm() + '» нічого не знайдено' : 'Ще немає дописів' }}</p>
                 </div>
             }
         }

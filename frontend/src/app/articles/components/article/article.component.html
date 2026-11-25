@@ -1,4 +1,4 @@
-<section class="container">
+<section class="article-page">
     <a href="" class="secondary back-button" aria-label="Назад" (click)="goBack($event)">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon">
             <path
@@ -12,6 +12,11 @@
             <div class="article-header">
                 <h2>{{ article()!.title }}</h2>
             </div>
+            <img #image
+                src="{{apiUrl}}/assets/img/{{article()!.coverImageName}}"
+                alt="{{ article()!.coverImageName }}"
+                class="article-image"
+                (error)="setDefaultImageOnError(image)"/>
             <div class="article-meta">
                 <p class="article-date">
                     <small>
@@ -23,19 +28,14 @@
                     Транскрипція
                 </label>
             </div>
-            <img #image
-                src="{{apiUrl}}/assets/img/{{article()!.coverImageName}}"
-                alt="{{ article()!.coverImageName }}"
-                class="article-image"
-                (error)="setDefaultImageOnError(image)"/>
             <p>{{ article()!.content }}</p>
 
             @if (!transcriptionView()) {
                 @for (transcription of article()!.transcriptions; track transcription.id) {
                     <hr/>
                     <section class="transcription" [class.active]="activeTranscriptionId() === transcription.id">
-                        <h4 class="transcription-title" (click)="setAudioTime(transcription)">
-                            {{ transcription.title }} ({{ transcription.start }} - {{ transcription.end }})
+                        <h4 class="transcription-title">
+                            <button type="button" (click)="setAudioTime(transcription)">{{ transcription.title }} ({{ transcription.start }} - {{ transcription.end }})</button>
                         </h4>
                         <p class="transcription-content">
                             {{ transcription.content }}
@@ -46,8 +46,8 @@
                 @for (transcription of article()!.rawTranscriptions; track transcription.id) {
                     <hr />
                     <section class="transcription" [class.active]="activeTranscriptionId() === transcription.id">
-                        <h4 class="transcription-title" (click)="setAudioTime(transcription)">
-                            ({{ transcription.start }} - {{ transcription.end }})
+                        <h4 class="transcription-title">
+                            <button type="button" (click)="setAudioTime(transcription)">({{ transcription.start }} - {{ transcription.end }})</button>
                         </h4>
                         <p class="transcription-content">
                             {{ transcription.content }}
@@ -55,8 +55,6 @@
                     </section>
                 }
             }
-
-            <hr/>
 
             <div class="audio-container">
                 <audio #audioPlayer controls (timeupdate)="onAudioTimeUpdate(audioPlayer.currentTime)">

@@ -1,2 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
 @use '@picocss/pico/scss';
+
+// One readable column for the whole blog
+.container {
+    max-width: calc(820px + 2 * var(--pico-spacing));
+    padding-inline: var(--pico-spacing);
+}

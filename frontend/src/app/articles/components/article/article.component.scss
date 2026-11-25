@@ -1,4 +1,4 @@
-.container {
+.article-page {
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -27,6 +27,21 @@
 }
 
 .article {
+    font-size: min(1rem, 18px);
+    line-height: 1.55;
+
+    h2 {
+        font-size: clamp(1.5rem, 4vw, 34px);
+        line-height: 1.15;
+        margin-bottom: 1rem;
+    }
+
+    // Full-bleed card on phones
+    @media (max-width: 575.98px) {
+        margin-inline: calc(-1 * var(--pico-spacing));
+        border-radius: 0;
+    }
+
     .article-header {
         display: flex;
         flex-direction: row;
@@ -36,8 +51,11 @@
     }
 
     .article-image {
-        aspect-ratio: 3 / 2;
-        padding-bottom: 1rem;
+        display: block;
+        width: calc(100% + 2 * var(--pico-block-spacing-horizontal));
+        max-width: none;
+        height: auto;
+        margin: 0 calc(-1 * var(--pico-block-spacing-horizontal)) 1rem;
     }
 
     .article-meta {
@@ -45,10 +63,17 @@
         flex-direction: row;
         justify-content: space-between;
         align-items: baseline;
+        flex-wrap: wrap;
+        gap: 0.25rem 1rem;
+        margin-bottom: 1rem;
 
         .article-date {
-            font-weight: 600;
             margin-bottom: 0px;
+            color: var(--pico-muted-color);
+
+            small {
+                font-size: 14px;
+            }
         }
 
         .transcription-switch {
@@ -61,15 +86,45 @@
 }
 
 .transcription {
-    &.active {
-        background-color: rgba(0, 123, 255, 0.2);
+    position: relative;
+
+    // Thin marker in the card padding shows what is playing now
+    &.active::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: -0.75rem;
+        width: 3px;
+        border-radius: 2px;
+        background-color: var(--pico-primary);
+    }
+
+    &.active .transcription-title {
+        color: var(--pico-primary);
+    }
+
+    .transcription-content {
+        margin-bottom: 0;
     }
 
     .transcription-title {
-        cursor: pointer;
+        font-size: min(1.25rem, 21px);
 
-        &:hover {
-            text-decoration: underline;
+        // Keyboard-accessible button that looks like plain heading text
+        button {
+            all: unset;
+            cursor: pointer;
+
+            &:hover {
+                text-decoration: underline;
+            }
+
+            &:focus-visible {
+                outline: 2px solid var(--pico-primary);
+                outline-offset: 2px;
+                border-radius: 2px;
+            }
         }
     }
 }
@@ -77,12 +132,14 @@
 .audio-container {
     position: sticky;
     bottom: 0;
-    padding: 0.5rem 0;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
+    z-index: 1;
+    margin: 0 calc(-1 * var(--pico-block-spacing-horizontal)) calc(-1 * var(--pico-block-spacing-vertical));
+    padding: 0.5rem var(--pico-block-spacing-horizontal);
+    background-color: var(--pico-card-background-color);
+    border-top: 1px solid var(--pico-muted-border-color);
 
     audio {
-        width: 70%;
+        display: block;
+        width: 100%;
     }
 }

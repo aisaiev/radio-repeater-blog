@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, ElementRef, inject, input, OnInit, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, inject, input, OnDestroy, OnInit, signal, viewChild } from '@angular/core';
 import { Location } from '@angular/common';
+import { Title } from '@angular/platform-browser';
 import { Router, RouterModule } from '@angular/router';
 import { ArticlesService } from '../../services/articles.service';
 import { ArticleWithContentDto, RawTranscriptionDto } from '../../dto/article.dto';
@@ -16,12 +17,14 @@ import { FormsModule } from '@angular/forms';
     templateUrl: './article.component.html',
     styleUrl: './article.component.scss',
 })
-export class ArticleComponent implements OnInit {
+export class ArticleComponent implements OnInit, OnDestroy {
     private readonly audioPlayer = viewChild<ElementRef<HTMLAudioElement>>('audioPlayer');
 
     private readonly articlesService = inject(ArticlesService);
     private readonly router = inject(Router);
     private readonly location = inject(Location);
+    private readonly title = inject(Title);
+    private readonly siteTitle = 'Блог ретранслятора К1';
 
     public articleId = input.required<number>({ alias: 'id' });
 
@@ -35,6 +38,10 @@ export class ArticleComponent implements OnInit {
         this.loadArticle();
     }
 
+    ngOnDestroy(): void {
+        this.title.setTitle(this.siteTitle);
+    }
+
     private loadArticle(): void {
         this.loading.set(true);
         this.articlesService
@@ -43,6 +50,8 @@ export class ArticleComponent implements OnInit {
             .subscribe((article) => {
                 if (!article) {
                     this.router.navigate(['']);
+                } else {
+                    this.title.setTitle(`${article.title} — ${this.siteTitle}`);
                 }
                 this.article.set(article);
             });
@@ -74,7 +83,12 @@ export class ArticleComponent implements OnInit {
 
     public goBack(event: Event): void {
         event.preventDefault();
-        this.location.back();
+        // Opened by a direct link: there is no list to go back to
+        if ((history.state?.navigationId ?? 1) > 1) {
+            this.location.back();
+        } else {
+            this.router.navigate(['']);
+        }
     }
 
     private findActiveTranscriptionId(transcriptions: RawTranscriptionDto[], currentTime: number): number | null {

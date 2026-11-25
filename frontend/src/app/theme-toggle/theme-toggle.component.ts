@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, Renderer2 } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 
 @Component({
     selector: 'app-theme-toggle',
@@ -8,17 +8,21 @@ import { ChangeDetectionStrategy, Component, inject, Renderer2 } from '@angular/
     styleUrls: ['./theme-toggle.component.scss'],
 })
 export class ThemeToggleComponent {
-    private renderer = inject(Renderer2);
-
-    public isDarkMode = false;
+    public isDarkMode = signal(this.isDarkActive());
 
     toggleTheme(): void {
-        this.isDarkMode = !this.isDarkMode;
-        this.updateHtml();
+        const theme = this.isDarkMode() ? 'light' : 'dark';
+        this.isDarkMode.set(theme === 'dark');
+        document.documentElement.dataset['theme'] = theme;
+        try {
+            localStorage.setItem('theme', theme);
+        } catch {
+            // Storage may be unavailable; the theme still applies for this visit
+        }
     }
 
-    private updateHtml(): void {
-        const theme = this.isDarkMode ? 'dark' : 'light';
-        this.renderer.setAttribute(document.documentElement, 'data-theme', theme);
+    private isDarkActive(): boolean {
+        const theme = document.documentElement.dataset['theme'];
+        return theme ? theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
     }
 }

@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { catchError, EMPTY, Observable, of, tap } from 'rxjs';
+import { catchError, Observable, of, tap } from 'rxjs';
 import { ArticleDto, ArticleWithContentDto } from '../dto/article.dto';
 import { PaginationResponseDto } from '../../common/pagination.dto';
 
@@ -23,10 +23,6 @@ export class ArticlesService {
                     article.date = new Date(article.date);
                 });
             }),
-            catchError((error) => {
-                console.error('Error fetching articles', error);
-                return EMPTY;
-            })
         );
     }
 
